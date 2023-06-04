@@ -4,13 +4,12 @@ import dev.urieloalves.domain.AggregateRoot;
 import dev.urieloalves.domain.validation.ValidationHandler;
 
 import java.time.Instant;
-import java.util.UUID;
 
 public class Category extends AggregateRoot<CategoryId> {
 
     private String name;
     private String description;
-    private boolean isActive;
+    private boolean active;
     private Instant createdAt;
     private Instant updatedAt;
     private Instant deletedAt;
@@ -19,7 +18,7 @@ public class Category extends AggregateRoot<CategoryId> {
             final CategoryId id,
             final String name,
             final String description,
-            final boolean isActive,
+            final boolean active,
             final Instant createdAt,
             final Instant updatedAt,
             final Instant deletedAt
@@ -27,7 +26,7 @@ public class Category extends AggregateRoot<CategoryId> {
         super(id);
         this.name = name;
         this.description = description;
-        this.isActive = isActive;
+        this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
@@ -57,6 +56,22 @@ public class Category extends AggregateRoot<CategoryId> {
         new CategoryValidator(this, handler).validate();
     }
 
+    public Category deactivate() {
+        if(getDeletedAt() == null) {
+            this.deletedAt = Instant.now();
+        }
+        this.active = false;
+        this.updatedAt = Instant.now();
+        return this;
+    }
+
+    public Category activate() {
+        this.deletedAt = null;
+        this.active = true;
+        this.updatedAt = Instant.now();
+        return this;
+    }
+
     public String getName() {
         return name;
     }
@@ -66,7 +81,7 @@ public class Category extends AggregateRoot<CategoryId> {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public Instant getCreatedAt() {
