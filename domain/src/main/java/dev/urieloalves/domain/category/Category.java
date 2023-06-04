@@ -1,6 +1,7 @@
 package dev.urieloalves.domain.category;
 
 import dev.urieloalves.domain.AggregateRoot;
+import dev.urieloalves.domain.validation.ValidationHandler;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class Category extends AggregateRoot<CategoryId> {
     ) {
         final var id = CategoryId.unique();
         final var now = Instant.now();
+        final var deletedAt = isActive ? null : now;
         return new Category(
                 id,
                 name,
@@ -46,8 +48,13 @@ public class Category extends AggregateRoot<CategoryId> {
                 isActive,
                 now,
                 now,
-                null
+                deletedAt
         );
+    }
+
+    @Override
+    public void validate(final ValidationHandler handler) {
+        new CategoryValidator(this, handler).validate();
     }
 
     public String getName() {
